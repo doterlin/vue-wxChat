@@ -24,8 +24,8 @@ export default {
       underTimes: 0,
       upperId: 0,
       underId: 6,
-      ownerAvatarUrl: '/src/assets/avatar1.png',
-      contactAvatarUrl: '/src/assets/avatar2.png',
+      ownerAvatarUrl: './src/assets/avatar1.png',
+      contactAvatarUrl: './src/assets/avatar2.png',
       wxChatData: [{
         direction: 2,
         id: 1,
