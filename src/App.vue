@@ -51,7 +51,7 @@ export default {
         direction: 2,
         id: 4,
         type: 2,
-        content: '/src/assets/wyz.jpg',
+        content: './src/assets/wyz.jpg',
         ctime: new Date().toLocaleString()
       },
       {
