@@ -3,18 +3,34 @@
 
 //参数：
 // width               组件宽度，默认450
+// wrapBg              外层父元素背景颜色，默认#efefef
 // maxHeight           展示窗口最高高度, 默认900
-// data                （必需）传入初始化数据
 // contactAvatarUrl    好友头像url
 // ownerAvatarUrl      微信主人头像url
 // ownerNickname       微信主人昵称
-// getUpperData        （必需）当滚动到上方时加载数据的方法，返回值要为Promise对象
+// getUpperData        （必需）当滚动到上方时加载数据的方法，返回值要为Promise对象，resolve的结构同data
 // getUnderData        （必需）当滚动到下方时加载数据的方法，返回值同上
+// data                （必需）传入初始化数据， 结构如下：
+[{
+    direction: 2, //为2表示微信主人发出的消息，1表示联系人
+    id: 1, //根据这个来排序消息
+    type: 1, //1为文本，2为图片
+    content: '你好!![呲牙]', //当type为1时这里是文本消息，当type2为2时这里要存放图片地址；后续会支持语音的显示
+    ctime: new Date().toLocaleString() //显示当前消息的发送时间
+},
+{
+    direction: 1,
+    id: 2,
+    type: 1,
+    content: '你也好。[害羞]',
+    ctime: new Date().toLocaleString()
+}]
+
 
 <style scoped>
-    .container{ width: 100%; height: 100%;z-index: 100; position: fixed; left:0; top: 0; overflow: hidden;}
+    .wxchat-container{ width: 100%; height: 100%;z-index: 100; position: fixed; left:0; top: 0; overflow: hidden;}
     .shadow{ position: absolute; top:0; left: 0; z-index: 100; width: 100%; height: 100%; background: #000; opacity: .2; }
-    .window {box-shadow: 1px 1px 20px -5px #000; max-width: 450px; background: #F5F5F5; margin: 0 auto; overflow: hidden; padding: 0; height: 100%;position: relative;z-index: 101;}
+    .window {box-shadow: 1px 1px 20px -5px #000; /*max-width: 450px;*/ min-width: 400px; background: #F5F5F5; margin: 0 auto; overflow: hidden; padding: 0; height: 100%;position: relative;z-index: 101;}
     button{border:0; background:none; border-radius: 0;text-align: center;}
     button{outline:none;}
     .w100{width: 100%;}
@@ -152,8 +168,8 @@
 </style>
 
 <template>
-    <div class="container">
-        <div class="window" id="window-view-container" :style="{maxHeight: maxHeight + 'px'}">
+    <div class="wxchat-container" :style="{backgroundColor: wrapBg}">
+        <div class="window" id="window-view-container" :style="{maxHeight: maxHeight + 'px', width: width +'px'}">
             <!-- data is empty -->
             <div class="loading" v-if="dataArray && dataArray.length==0">
                 <div style="margin-top: 300px;text-align:center; font-size: 16px;">
@@ -169,7 +185,7 @@
             </div>
 
             <div class="title" v-if="dataArray && dataArray.length>0">
-                <p v-text="ownerNickname"></p>
+                <p v-text="contactNickname"></p>
             </div>
             <!-- main -->
             <ScrollLoader :minHeight="minHeight" @scroll-to-top="refresh" @scroll-to-botton="infinite" class="container-main" v-if="dataArray && dataArray.length>0" :style="{maxHeight: maxHeight-50 + 'px'}">
@@ -216,23 +232,29 @@
         },
 
         props: {
-            ownerNickname: {
+            contactNickname: {
                 type: String,
                 default: 'Mystic Faces'
             }, 
 
             data: {
                 type: Array,
+                required: true
             },
 
             width: {
                 type: Number,
-                default: 600,
+                default: 450,
             },
-            
+
+            wrapBg: {
+                type: String,
+                default: '#efefef'
+            },
+
             maxHeight: {
                 type: Number,
-                default: 800
+                default: 700
             },
 
             contactAvatarUrl: {
@@ -244,11 +266,13 @@
             },
 
             getUpperData: {
-                type: Function
+                type: Function,
+                required: true
             },
 
             getUnderData: {
-                type: Function
+                type: Function,
+                required: true
             }
         },
 
@@ -295,13 +319,11 @@
                 
                 try {
                     this.getUpperData().then(function(data){
-                        console.log(data)
                         if(data.length==0){
                             me.isRefreshedAll = true;
                             done(true);
                         }else{
-                            me.dataArray = data.concat(me.dataArray); //倒序合并
-                            console.log( me.dataArray )
+                            me.dataArray = data.reverse().concat(me.dataArray); //倒序合并
                             done();
                         }
                     })
@@ -325,14 +347,12 @@
                 
                 try {
                     this.getUnderData().then(function(data){
-                        console.log(data)
                         if(data == 0){
                             me.isLoadedAll = true;
                             done(true);
                         }else{
                             done();
                             me.dataArray = me.dataArray.concat(data); //直接合并
-                            console.log( me.dataArray )
                         }
                     })
                 } catch (error) {

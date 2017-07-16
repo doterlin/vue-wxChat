@@ -1,13 +1,15 @@
+//主文件，对wxChat的用法做示例
+
 <template>
 <wxChat 
   :data="wxChatData"
   :showShade="false"
-  ownerNickname="Doterlin"
+  contactNickname="简叔"
   :getUpperData="getUpperData"
   :getUnderData="getUnderData"
   :ownerAvatarUrl="ownerAvatarUrl"
   :contactAvatarUrl="contactAvatarUrl"
-  :width="600">
+  :width="420">
 </wxChat>
 </template>
 
@@ -70,7 +72,10 @@ export default {
       var me = this;
       
       // 这里为模拟异步加载数据
-      // 实际上你可能要这么写 return axios.get(...)
+      // 实际上你可能要这么写:
+      // return axios.get('xxx').then(function(result){
+      //     return result;  //result的格式需要类似下面resolve里面的数组
+      // })
       return new Promise(function(resolve){
         setTimeout(function(){
            //模拟加载完毕
@@ -131,7 +136,7 @@ export default {
           )
         }, 1000);
 
-        me.upperId = me.underId+2;
+        me.underId = me.underId+2;
         me.underTimes++;
       })
     }
@@ -141,6 +146,10 @@ export default {
 </script>
 
 <style>
+*{
+  margin: 0;
+  padding: 0;
+}
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
