@@ -1,5 +1,5 @@
 //微信聊天可视化组件
-//依赖scrollLoader组件, 依赖指令v-emotion（写在main.js）
+//依赖scrollLoader组件, 依赖指令v-emotion（实现请查看main.js）
 
 //参数：
 // width               组件宽度，默认450
@@ -175,7 +175,7 @@
             <ScrollLoader :minHeight="minHeight" @scroll-to-top="refresh" @scroll-to-botton="infinite" class="container-main" v-if="dataArray && dataArray.length>0" :style="{maxHeight: maxHeight-50 + 'px'}">
                 <div class="message">
                     <ul>
-                        <li v-for="(message, index) in dataArray" :key="index" :class="message.direction==2?'an-move-right':'an-move-left'">
+                        <li v-for="(message, index) in dataArray" :key="message.id" :class="message.direction==2?'an-move-right':'an-move-left'">
                             <p class="time"> <span v-text="message.ctime"></span> </p>
                             <p class="time system" v-if="message.type==10000"> <span v-html="message.content"></span> </p>
                             <div :class="'main' + (message.direction==2?' self':'')" v-else>
@@ -254,15 +254,14 @@
 
         data() {
             return {
-                isLaoding: true,
+                isUpperLaoding: false,
+                isUnderLaoding: false,
 
                 isRefreshedAll: false,
                 isLoadedAll: false,
                 
                 minHeight: 700,
-
-                dataArray: [],
-
+                dataArray: []
             }
         },
 
@@ -278,14 +277,19 @@
 
         methods: {
             initData(){
-                this.dataArray=this.dataArray.concat(this.data);
+                this.dataArray = this.dataArray.concat(this.data);
             },
 
             //向上拉刷新
             refresh(done) {
                 var me = this;
-                if(me.isRefreshedAll){ 
+                if(me.isUpperLaoding){
+                    return;
+                }
+
+                if(me.isRefreshedAll){
                     done(true);
+                    me.isUpperLaoding = false;
                     return;
                 }
                 
@@ -296,38 +300,45 @@
                             me.isRefreshedAll = true;
                             done(true);
                         }else{
-                            me.dataArray = data.reverse().concat(me.dataArray); //倒序合并
+                            me.dataArray = data.concat(me.dataArray); //倒序合并
+                            console.log( me.dataArray )
                             done();
                         }
                     })
                 } catch (error) {
                     console.error('wxChat: props "getUpperData" must return a promise object!')
                 }
-
+                me.isUpperLaoding = false;
             },
 
             //向下拉加载
             infinite(done) {
                 var me = this;
+                if(me.isUnderLaoding){
+                    return;
+                }
                 if(me.isLoadedAll){
                     done(true);
+                    me.isUnderLaoding = false;
                     return;
                 }
                 
                 try {
                     this.getUnderData().then(function(data){
                         console.log(data)
-                        if(data==0){
+                        if(data == 0){
                             me.isLoadedAll = true;
                             done(true);
                         }else{
                             done();
                             me.dataArray = me.dataArray.concat(data); //直接合并
+                            console.log( me.dataArray )
                         }
                     })
                 } catch (error) {
                     console.error('wxChat: props "getUnderData" must return a promise object!')
                 }
+                me.isUnderLaoding = false;
             }
 
         }
