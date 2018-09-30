@@ -9,7 +9,7 @@
   :getUnderData="getUnderData"
   :ownerAvatarUrl="ownerAvatarUrl"
   :contactAvatarUrl="contactAvatarUrl"
-  :width="420">
+  :width="width">
 </wxChat>
 </template>
 
@@ -24,6 +24,7 @@ export default {
       underTimes: 0,
       upperId: 0,
       underId: 6,
+      width: window.screen.width,
       ownerAvatarUrl: './src/assets/avatar1.png',
       contactAvatarUrl: './src/assets/avatar2.png',
       wxChatData: [{
@@ -64,8 +65,21 @@ export default {
     }
   },
   components:{wxChat},
-
+  created(){
+    this.initWidth();
+  },
   methods:{
+    initWidth(){
+      var ua = navigator.userAgent;
+      var ipad = ua.match(/(iPad).*OS\s([\d_]+)/),
+      isIphone =!ipad && ua.match(/(iPhone\sOS)\s([\d_]+)/),
+      isAndroid = ua.match(/(Android)\s+([\d.]+)/),
+      isMobile = isIphone || isAndroid;
+      //非移动端设置400px宽度，移动端是100%
+      if(!isMobile){
+        this.width = 400
+      }
+    },
 
     //向上滚动加载数据
     getUpperData(){

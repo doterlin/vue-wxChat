@@ -30,7 +30,7 @@
 <style scoped>
     .wxchat-container{ width: 100%; height: 100%;z-index: 100; position: fixed; left:0; top: 0; overflow: hidden;}
     .shadow{ position: absolute; top:0; left: 0; z-index: 100; width: 100%; height: 100%; background: #000; opacity: .2; }
-    .window {box-shadow: 1px 1px 20px -5px #000; /*max-width: 450px;*/ min-width: 400px; background: #F5F5F5; margin: 0 auto; overflow: hidden; padding: 0; height: 100%;position: relative;z-index: 101;}
+    .window {box-shadow: 1px 1px 20px -5px #000; /*max-width: 450px;*/ min-width: 300px; background: #F5F5F5; margin: 0 auto; overflow: hidden; padding: 0; height: 100%;position: relative;z-index: 101;}
     button{border:0; background:none; border-radius: 0;text-align: center;}
     button{outline:none;}
     .w100{width: 100%;}
